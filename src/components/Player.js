@@ -21,12 +21,14 @@ export class Player extends React.Component {
       seek: 0
     };
 
-    this.playlists = this.props.playlists.map(({ filename, precept, duration }) => ({
-      ogg: `https://s3-ap-southeast-1.amazonaws.com/transprayer/ogg/${filename}.ogg`,
-      mp3: `https://s3-ap-southeast-1.amazonaws.com/transprayer/mp3/${filename}.mp3`,
-      precept,
-      duration
-    }));
+    this.playlists = this.props.playlists.map(
+      ({ filename, precept, duration }) => ({
+        ogg: `https://s3-ap-southeast-1.amazonaws.com/transprayer/ogg/${filename}.ogg`,
+        mp3: `https://s3-ap-southeast-1.amazonaws.com/transprayer/mp3/${filename}.mp3`,
+        precept,
+        duration
+      })
+    );
   }
 
   componentWillUnmount() {
@@ -50,7 +52,7 @@ export class Player extends React.Component {
   };
 
   handleOnPlay = () => {
-
+    this.props.setPlaying(true);
     this.renderSeekPos();
   };
 
@@ -62,13 +64,13 @@ export class Player extends React.Component {
   };
 
   handleOnEnd = () => {
+    this.clearRAF();
     if (this.props.player.index + 1 >= this.props.playlists.length) {
       this.props.setIndex();
       this.props.setPlaying(false);
     } else {
-      this.clearRAF();
       this.props.incrementIndex();
-      this.props.setPlaying(true);
+      // this.props.setPlaying(true);
     }
   };
 
@@ -134,7 +136,9 @@ export class Player extends React.Component {
         <p>
           {this.state.loaded ? formatTime(this.state.seek) : '0.00'}
           {' / '}
-          {this.state.loaded ? formatTime(this.playlists[this.props.player.index].duration) : '0.00'}
+          {this.state.loaded
+            ? formatTime(this.playlists[this.props.player.index].duration)
+            : '0.00'}
         </p>
       </div>
     );
@@ -149,7 +153,7 @@ const mapDispatchToProps = (dispatch, props) => ({
   incrementIndex: () => dispatch(incrementIndex()),
   decrementIndex: () => dispatch(decrementIndex()),
   isPlayingToggle: () => dispatch(isPlayingToggle()),
-  setPlaying: boo => dispatch(setPlaying(boo)),
+  setPlaying: isPlay => dispatch(setPlaying(isPlay)),
   setIndex: index => dispatch(setIndex(index))
 });
 
